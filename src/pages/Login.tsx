@@ -20,6 +20,7 @@ const Login = () => {
     try {
       const response = await loginUser(values);
       message.success('Login successful!');
+      localStorage.setItem("token", response.data.token);
       sessionStorage.setItem('authToken', response.data.token);
       navigate('/dashboard');
     } catch (error) {
