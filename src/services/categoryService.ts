@@ -1,6 +1,10 @@
 // src/services/categoryService.ts
 
 import api from "./api"; // Import your Axios instance or configure it accordingly
+import axios from "axios";
+// import API_URL from './api'
+const CATEGORY_API_URL = "http://localhost:5000/api/categories";
+
 
 interface Category {
   _id: string;
@@ -16,6 +20,28 @@ export const getCategories = async (): Promise<Category[]> => {
     throw new Error("Failed to fetch categories");
   }
 };
+
+export const deleteCategoryById = async (id: string) => {
+  try {
+    const response = await api.delete(`${CATEGORY_API_URL}/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error deleting category:", error);
+    throw new Error("Failed to delete category");
+  }
+};
+
+export const editCategoryById = async (id: string, updatedData: { name: string }) => {
+  try {
+    const response = await api.put(`${CATEGORY_API_URL}/${id}`, updatedData); 
+    return response.data;
+  } catch (error) {
+    console.error("Error updating category:", error);
+    throw error;
+  }
+};
+
+
 
 export const createCategory = async (category: { name: string, userId: string }) => {
     try {

@@ -26,7 +26,7 @@ const CategoryChart: React.FC<Props> = ({ transactions }) => {
   const expenseData = Object.entries(expenseCategories).map(([name, value]) => ({ name, value }));
 
   return (
-    <Row gutter={16}>
+    <Row gutter={16} style={{marginTop:"1rem"}}>
       <Col span={12}>
         <Card title="Income by Category">
           <ResponsiveContainer width="100%" height={250}>

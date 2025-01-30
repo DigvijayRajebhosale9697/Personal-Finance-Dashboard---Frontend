@@ -31,8 +31,7 @@ const Dashboard: React.FC = () => {
   if (error) return <Alert message={error} type="error" showIcon />;
 
   return (
-    <div style={{ padding: "20px" }}>
-      <Title level={2}>Dashboard</Title>
+    <div >
       <IncomeExpenseChart transactions={transactions} />
       <CategoryChart transactions={transactions} />
       <SavingsTracker transactions={transactions} />

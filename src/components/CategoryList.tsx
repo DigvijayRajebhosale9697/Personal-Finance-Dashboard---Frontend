@@ -8,9 +8,9 @@ interface Category {
 }
 
 interface CategoryListProps {
-  categories: Category[]; // Define the expected category structure
-  handleEditCategory: (index: number) => void;
-  handleDeleteCategory: (index: number) => void;
+  categories: Category[];
+  handleEditCategory: (id: string, name: string) => void;
+  handleDeleteCategory: (id: string) => void;
 }
 
 const CategoryList: React.FC<CategoryListProps> = ({
@@ -20,37 +20,41 @@ const CategoryList: React.FC<CategoryListProps> = ({
 }) => {
   const columns = [
     {
+      title: "SR NO.",
+      dataIndex: "srNo",
+      key: "srNo",
+      width: 100,
+      render: (_: any, __: any, index: number) => index + 1, // Generate serial number
+    },
+    {
       title: "Category Name",
       dataIndex: "name",
       key: "name",
     },
-    // {
-    //   title: "Actions",
-    //   key: "actions",
-    //   render: (_, record: Category, index: number) => (
-    //     <span>
-    //       <Button
-    //         icon={<EditOutlined />}
-    //         onClick={() => handleEditCategory(index)}
-    //         style={{ marginRight: 10 }}
-    //       />
-    //       <Button
-    //         icon={<DeleteOutlined />}
-    //         danger
-    //         onClick={() => handleDeleteCategory(index)}
-    //       />
-    //     </span>
-    //   ),
-    // },
+    {
+      title: "Actions",
+      key: "actions",
+      width: 120,
+      render: (_: any, record: Category) => (
+        <>
+          <Button
+            icon={<EditOutlined />}
+            onClick={() => handleEditCategory(record._id, record.name)}
+            style={{ marginRight: 8 }}
+          />
+          <Button icon={<DeleteOutlined />} danger onClick={() => handleDeleteCategory(record._id)} />
+        </>
+      ),
+    },
   ];
 
   return (
     <Table
       columns={columns}
-      dataSource={categories}
-      rowKey="_id" // Assuming each category has a unique _id
+      dataSource={categories.map((cat, index) => ({ ...cat, srNo: index + 1 }))}
+      rowKey="_id"
       bordered
-      pagination={{ pageSize: 5 }} // You can customize the page size
+      pagination={{ pageSize: 5 }}
       style={{ marginTop: 20 }}
     />
   );

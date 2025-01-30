@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Button, Typography, Table, Space, Input, Row, Col, Modal } from "antd";
+import { Button, Typography, Table, Space, Input, Row, Col, Modal, Card } from "antd";
 import { PlusOutlined, EyeOutlined } from "@ant-design/icons";
 import AddTransaction from "./AddTransaction";
 import { getTransactions, addTransaction } from "../services/transactionService"; // Import the service functions
@@ -100,11 +100,7 @@ const TransactionsList: React.FC = () => {
   ];
 
   return (
-    <div style={{ maxWidth: 1200, margin: "0 auto", padding: 20 }}>
-      <Title level={2} style={{ textAlign: "center" }}>
-        Transactions
-      </Title>
-
+    <Card title="Transaction List" style={{ maxWidth: 1200, margin: "0 auto", padding: 20 }}>
       {/* Header with search and Add button */}
       <Row justify="space-between" align="middle">
         <Col>
@@ -145,7 +141,6 @@ const TransactionsList: React.FC = () => {
 
       {/* Transaction Detail Modal */}
       <Modal
-        title="Transaction Details"
         visible={isTransactionDetailModalVisible && transactionDetail !== null}
         onCancel={() => setIsTransactionDetailModalVisible(false)} // Close Transaction Detail modal
         footer={null}
@@ -155,11 +150,11 @@ const TransactionsList: React.FC = () => {
             <p><strong>Date:</strong> {transactionDetail.date}</p>
             <p><strong>Type:</strong> {transactionDetail.type}</p>
             <p><strong>Category:</strong> {transactionDetail.category}</p>
-            <p><strong>Amount:</strong> ${transactionDetail.amount.toFixed(2)}</p>
+            <p><strong>Amount:</strong> ₹{transactionDetail.amount.toFixed(2)}</p>
           </div>
         )}
       </Modal>
-    </div>
+    </Card>
   );
 };
 

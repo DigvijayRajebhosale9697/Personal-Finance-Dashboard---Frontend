@@ -1,59 +1,82 @@
 import React, { useState, useEffect } from "react";
-import { Card } from "antd";
+import { Card, message, Modal, Input } from "antd";
 import CategoryInput from "../components/CategoryInput";
 import CategoryList from "../components/CategoryList";
-import { createCategory, getCategories } from "../services/categoryService"; // Import the createCategory service
+import { createCategory, getCategories, editCategoryById, deleteCategoryById } from "../services/categoryService";
 
 const CategoryManagement = ({ userId }) => {
-  const [categories, setCategories] = useState<any[]>([]); // Store fetched categories
+  const [categories, setCategories] = useState<any[]>([]);
   const [categoryName, setCategoryName] = useState("");
-  const [editingIndex, setEditingIndex] = useState<number | null>(null);
+  const [editingCategory, setEditingCategory] = useState<{ id: string; name: string } | null>(null);
+  const [isEditModalVisible, setIsEditModalVisible] = useState(false);
 
-  // Function to fetch categories when the component mounts
+  // Fetch categories from API
   useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const data = await getCategories(); // Fetch categories from the service
-        setCategories(data); // Update state with fetched categories
-      } catch (error) {
-        console.error("Error fetching categories:", error);
-      }
-    };
-
-    fetchCategories(); // Call fetchCategories when component mounts
+    fetchCategories();
   }, []);
 
-  // Function to handle adding or updating a category
+  const fetchCategories = async () => {
+    try {
+      const data = await getCategories();
+      setCategories(data);
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+    }
+  };
+
+  // Handle adding a new category
   const handleAddCategory = async () => {
     if (!categoryName.trim()) return;
+    try {
+      const newCategory = { name: categoryName, userId };
+      const createdCategory = await createCategory(newCategory);
+      setCategories([...categories, createdCategory]);
+      setCategoryName("");
+      message.success("Category added successfully!");
+    } catch (error) {
+      console.error("Error adding category:", error);
+    }
+  };
 
-    const newCategory = { name: categoryName, userId };
+  // Handle editing a category (Show Modal)
+  const handleEditCategory = (id: string, currentName: string) => {
+    setEditingCategory({ id, name: currentName });
+    setIsEditModalVisible(true);
+  };
 
-    if (editingIndex !== null) {
-      const updatedCategories = [...categories];
-      updatedCategories[editingIndex].name = categoryName;
-      setCategories(updatedCategories);
-      setEditingIndex(null);
-    } else {
+  // Confirm category edit and update in DB
+  const handleUpdateCategory = async () => {
+    if (editingCategory) {
       try {
-        // Call the createCategory service to add the new category to the backend
-        const createdCategory = await createCategory(newCategory);
-        setCategories([...categories, createdCategory]); // Add the created category to the state
+        await editCategoryById(editingCategory.id, { name: editingCategory.name });
+        message.success("Category updated successfully!");
+        setIsEditModalVisible(false);
+        setEditingCategory(null);
+        fetchCategories(); // Refresh category list
       } catch (error) {
-        console.error("Error adding category:", error);
+        message.error("Failed to update category.");
       }
     }
-
-    setCategoryName(""); // Clear the input field
   };
 
-  const handleEditCategory = (index: number) => {
-    setCategoryName(categories[index].name);
-    setEditingIndex(index);
-  };
-
-  const handleDeleteCategory = (index: number) => {
-    setCategories(categories.filter((_, i) => i !== index));
+  // Handle category deletion
+  const handleDeleteCategory = async (id: string) => {
+    Modal.confirm({
+      title: "Are you sure you want to delete this category?",
+      content: "This action cannot be undone.",
+      okText: "Yes, Delete",
+      okType: "danger",
+      cancelText: "Cancel",
+      onOk: async () => {
+        try {
+          await deleteCategoryById(id);
+          message.success("Category deleted successfully!");
+          fetchCategories();
+        } catch (error) {
+          message.error("Failed to delete category.");
+        }
+      },
+    });
   };
 
   return (
@@ -62,13 +85,25 @@ const CategoryManagement = ({ userId }) => {
         categoryName={categoryName}
         setCategoryName={setCategoryName}
         handleAddCategory={handleAddCategory}
-        editingIndex={editingIndex}
       />
       <CategoryList
-        categories={categories} // Pass categories as a prop
+        categories={categories}
         handleEditCategory={handleEditCategory}
         handleDeleteCategory={handleDeleteCategory}
       />
+
+      {/* Edit Category Modal */}
+      <Modal
+        title="Edit Category"
+        open={isEditModalVisible}
+        onOk={handleUpdateCategory}
+        onCancel={() => setIsEditModalVisible(false)}
+      >
+        <Input
+          value={editingCategory?.name}
+          onChange={(e) => setEditingCategory({ ...editingCategory!, name: e.target.value })}
+        />
+      </Modal>
     </Card>
   );
 };

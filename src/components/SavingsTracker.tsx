@@ -15,7 +15,7 @@ const SavingsTracker: React.FC<Props> = ({ transactions }) => {
   const savingsPercentage = (savings / savingsGoal) * 100;
 
   return (
-    <Card title="Savings Tracker">
+    <Card title="Savings Tracker" style={{marginTop:"1rem"}}>
       <Progress percent={Math.min(savingsPercentage, 100)} status="active" />
       <p>₹{savings} saved out of ₹{savingsGoal} goal</p>
     </Card>

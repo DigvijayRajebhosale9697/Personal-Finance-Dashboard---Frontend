@@ -5,11 +5,13 @@ import * as Yup from 'yup';
 import { Button, Typography, Input, message } from 'antd';
 import { loginUser } from '../services/authService';
 import '../styles/Auth.css'; 
+import { useAuth } from '../context/AuthContext';
 
 const { Title } = Typography;
 
 const Login = () => {
   const navigate = useNavigate();
+  const { setEmail } = useAuth(); 
 
   const validationSchema = Yup.object().shape({
     email: Yup.string().email('Invalid email format').required('Email is required'),
@@ -22,6 +24,8 @@ const Login = () => {
       message.success('Login successful!');
       localStorage.setItem("token", response.data.token);
       sessionStorage.setItem('authToken', response.data.token);
+      localStorage.setItem('email', values.email);
+      setEmail(values.email);
       navigate('/dashboard');
     } catch (error) {
       message.error('Login failed! Please check your credentials.');

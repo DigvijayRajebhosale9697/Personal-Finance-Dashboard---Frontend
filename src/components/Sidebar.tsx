@@ -1,5 +1,5 @@
 import React from "react";
-import { Layout, Menu, Avatar, Typography, Divider } from "antd";
+import { Layout, Menu, Avatar, Typography } from "antd";
 import {
   DashboardOutlined,
   DollarCircleOutlined,
@@ -23,10 +23,7 @@ const Sidebar: React.FC = () => {
   return (
     <Sider theme="dark" collapsible>
       <div style={{ padding: "20px", textAlign: "center" }}>
-        <Avatar size={64} src="https://cdn-icons-png.flaticon.com/512/219/219988.png" />
-        <Title level={4} style={{ color: "white", marginTop: 10 }}>
-          Digvijay Rajebhosale
-        </Title>
+        <Avatar size={64} src="https://marketplace.canva.com/EAGQZhT83lg/1/0/1600w/canva-dark-green-modern-illustrative-finance-service-logo-GTKa2Yxea4Y.jpg" />
       </div>
       <Menu theme="dark" mode="inline" defaultSelectedKeys={["1"]}>
         <Menu.Item key="1" icon={<DashboardOutlined />}>
