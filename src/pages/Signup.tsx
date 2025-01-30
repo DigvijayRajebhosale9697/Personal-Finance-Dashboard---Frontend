@@ -3,7 +3,7 @@ import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { Button, Typography, Input, message } from 'antd';
 import { registerUser } from '../services/authService';
-import '../styles/Auth.css'; // Import CSS file
+import '../styles/Auth.css'; 
 
 const { Title } = Typography;
 

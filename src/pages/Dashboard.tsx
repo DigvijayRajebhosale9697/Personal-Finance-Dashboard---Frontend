@@ -1,11 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { Typography, Spin, Alert } from "antd";
+import { Spin, Alert } from "antd";
 import IncomeExpenseChart from "../components/IncomeExpenseChart";
 import CategoryChart from "../components/CategoryChart";
 import SavingsTracker from "../components/SavingsTracker";
 import { getTransactions, Transaction } from "../services/transactionService";
-
-const { Title } = Typography;
 
 const Dashboard: React.FC = () => {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
@@ -27,7 +25,20 @@ const Dashboard: React.FC = () => {
     fetchTransactions();
   }, []);
 
-  if (loading) return <Spin tip="Loading transactions..." />;
+  if (loading)
+    return (
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100vh", 
+        }}
+      >
+        <Spin tip="Loading transactions..." />
+      </div>
+    );
+  
   if (error) return <Alert message={error} type="error" showIcon />;
 
   return (

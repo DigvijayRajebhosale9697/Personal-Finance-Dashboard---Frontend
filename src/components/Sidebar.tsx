@@ -1,5 +1,5 @@
-import React from "react";
-import { Layout, Menu, Avatar, Typography } from "antd";
+import React, { useState } from "react";
+import { Layout, Menu, Avatar } from "antd";
 import {
   DashboardOutlined,
   DollarCircleOutlined,
@@ -8,24 +8,45 @@ import {
   UserOutlined,
   LogoutOutlined,
 } from "@ant-design/icons";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 
 const { Sider } = Layout;
-const { Title } = Typography;
 
 const Sidebar: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation(); // Get current location
+  const [collapsed, setCollapsed] = useState<boolean>(true);
 
   const handleLogout = () => {
-    navigate("/"); 
+    navigate("/");
+  };
+
+  // Map paths to menu item keys
+  const getSelectedKey = () => {
+    if (location.pathname.includes("/dashboard")) return "1";
+    if (location.pathname.includes("/transactions")) return "2";
+    if (location.pathname.includes("/category")) return "3";
+    if (location.pathname.includes("/profile")) return "5";
+    return "1"; // Default to dashboard
   };
 
   return (
-    <Sider theme="dark" collapsible>
-      <div style={{ padding: "20px", textAlign: "center" }}>
-        <Avatar size={64} src="https://marketplace.canva.com/EAGQZhT83lg/1/0/1600w/canva-dark-green-modern-illustrative-finance-service-logo-GTKa2Yxea4Y.jpg" />
+    <Sider
+      theme="dark"
+      collapsible
+      collapsed={collapsed}
+      onCollapse={(value) => setCollapsed(value)}
+      breakpoint="md"
+      collapsedWidth={80}
+      defaultCollapsed={true}
+    >
+      <div className="logoContainer" style={{ textAlign: "center", padding: "10px 0" }}>
+        <Avatar
+          size={collapsed ? 40 : 44}
+          src="https://marketplace.canva.com/EAGQZhT83lg/1/0/1600w/canva-dark-green-modern-illustrative-finance-service-logo-GTKa2Yxea4Y.jpg"
+        />
       </div>
-      <Menu theme="dark" mode="inline" defaultSelectedKeys={["1"]}>
+      <Menu theme="dark" mode="inline" selectedKeys={[getSelectedKey()]}>
         <Menu.Item key="1" icon={<DashboardOutlined />}>
           <Link to="/dashboard">Dashboard</Link>
         </Menu.Item>
@@ -35,8 +56,6 @@ const Sidebar: React.FC = () => {
         <Menu.Item key="3" icon={<BarChartOutlined />}>
           <Link to="/category">Category</Link>
         </Menu.Item>
-
-        {/* <Divider style={{ background: "gray", margin: "10px 0" }} /> */}
 
         <Menu.SubMenu key="4" icon={<SettingOutlined />} title="Settings">
           <Menu.Item key="5" icon={<UserOutlined />}>

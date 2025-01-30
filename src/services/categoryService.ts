@@ -1,10 +1,7 @@
-// src/services/categoryService.ts
+import api from "./api"; 
 
-import api from "./api"; // Import your Axios instance or configure it accordingly
-import axios from "axios";
-// import API_URL from './api'
-const CATEGORY_API_URL = "http://localhost:5000/api/categories";
-
+// const CATEGORY_API_URL = "http://localhost:5000/api/categories";
+const CATEGORY_API_URL = "https://personal-finance-dashboard-backend.onrender.com/api/categories";
 
 interface Category {
   _id: string;
@@ -13,8 +10,8 @@ interface Category {
 
 export const getCategories = async (): Promise<Category[]> => {
   try {
-    const response = await api.get("/categories"); // Make a GET request to fetch categories
-    return response.data; // Return the category data
+    const response = await api.get("/categories"); 
+    return response.data;
   } catch (error) {
     console.error("Error fetching categories:", error);
     throw new Error("Failed to fetch categories");
@@ -43,11 +40,10 @@ export const editCategoryById = async (id: string, updatedData: { name: string }
 
 
 
-export const createCategory = async (category: { name: string, userId: string }) => {
+export const createCategory = async (category: { name: string}) => {
     try {
-      // Using the api instance to send the POST request
       const response = await api.post("/categories", category); 
-      return response.data; // Return the created category data
+      return response.data;
     } catch (error) {
       console.error("Error creating category:", error);
       throw new Error("Failed to create category");

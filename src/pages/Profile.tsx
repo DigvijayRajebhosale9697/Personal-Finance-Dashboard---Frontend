@@ -1,11 +1,11 @@
 import React from "react";
 import { Card, Avatar, Typography } from "antd";
-import { useAuth } from "../context/AuthContext"; // Import useAuth
+import { useAuth } from "../context/AuthContext"; 
 
-const { Title, Text } = Typography;
+const { Title } = Typography;
 
 const Profile: React.FC = () => {
-  const { email } = useAuth(); // Get email from Context
+  const { email } = useAuth(); 
 
   const user = {
     name: "Digvijay Rajebhosale",

@@ -5,3 +5,23 @@
     display: flex;
     gap: 1rem;
 }
+.forgot-password:hover{
+cursor: pointer;
+}
+.logoContainer{
+    padding: 20px;
+    text-align: center;
+}
+.TransactionList{
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+@media (max-width: 768px) {
+    .TransactionList {
+        padding: 0;
+    }
+    .CateoryInput{
+        flex-wrap: wrap;
+    }
+}

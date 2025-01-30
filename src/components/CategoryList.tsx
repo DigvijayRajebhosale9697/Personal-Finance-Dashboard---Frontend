@@ -24,7 +24,7 @@ const CategoryList: React.FC<CategoryListProps> = ({
       dataIndex: "srNo",
       key: "srNo",
       width: 100,
-      render: (_: any, __: any, index: number) => index + 1, // Generate serial number
+      render: (_: any, __: any, index: number) => index + 1,
     },
     {
       title: "Category Name",

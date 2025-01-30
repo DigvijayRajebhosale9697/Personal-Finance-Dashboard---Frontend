@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { Button, Typography, Table, Space, Input, Row, Col, Modal, Card } from "antd";
+import { Button, Table, Input, Row, Col, Modal, Card, Spin } from "antd";
 import { PlusOutlined, EyeOutlined } from "@ant-design/icons";
 import AddTransaction from "./AddTransaction";
-import { getTransactions, addTransaction } from "../services/transactionService"; // Import the service functions
+import { getTransactions, addTransaction } from "../services/transactionService";
+import { useNavigate } from 'react-router-dom';
 
-const { Title } = Typography;
 
 interface Transaction {
   _id: string;
@@ -17,50 +17,67 @@ interface Transaction {
 const TransactionsList: React.FC = () => {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [filteredTransactions, setFilteredTransactions] = useState<Transaction[]>([]);
-  const [isAddModalVisible, setIsAddModalVisible] = useState(false); // State for AddTransaction modal
-  const [isTransactionDetailModalVisible, setIsTransactionDetailModalVisible] = useState(false); // State for Transaction Detail modal
-  const [transactionDetail, setTransactionDetail] = useState<Transaction | null>(null); // Store the selected transaction details
+  const [isAddModalVisible, setIsAddModalVisible] = useState(false);
+  const [isTransactionDetailModalVisible, setIsTransactionDetailModalVisible] = useState(false);
+  const [transactionDetail, setTransactionDetail] = useState<Transaction | null>(null);
   const [searchText, setSearchText] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(false); // Added loading state
+
+  const navigate = useNavigate();
+
 
   useEffect(() => {
-    // Fetch transactions from the API on component mount
     const fetchTransactions = async () => {
       try {
-        const data = await getTransactions(); // Fetch transactions using the service
-        setTransactions(data); // Set data from the response
-        setFilteredTransactions(data); // Set data to filtered transactions initially
+        const data = await getTransactions(); 
+        setTransactions(data);
+        setFilteredTransactions(data);
       } catch (error) {
         console.error("Error fetching transactions:", error);
       }
     };
 
     fetchTransactions();
-  }, []);
-
+  }, []); // T
+  
   const handleAddTransaction = async (newTransaction: Transaction) => {
     try {
-      const addedTransaction = await addTransaction(newTransaction); // Add transaction using the service
-      setTransactions([...transactions, addedTransaction]); // Add the new transaction to the list
-      setFilteredTransactions([...filteredTransactions, addedTransaction]); // Add to filtered transactions as well
-      setIsAddModalVisible(false); // Close the AddTransaction modal after adding the transaction
+      setLoading(true); 
+      navigate('/dashboard');
+      const addedTransaction = await addTransaction(newTransaction);
+      
+      // Ensure addedTransaction is of type Transaction
+      if (addedTransaction) {
+        setTransactions((prev) => [...prev, addedTransaction]);
+        setFilteredTransactions((prev) => [...prev, addedTransaction]);
+      }
+      
+      setIsAddModalVisible(false);
+      setLoading(false); 
+      
+
     } catch (error) {
+      setLoading(false); 
       console.error("Error adding transaction:", error);
     }
   };
+  
+  
 
   const handleSearch = (value: string) => {
     setSearchText(value);
-    const filtered = transactions.filter((transaction) =>
-      transaction.category.toLowerCase().includes(value.toLowerCase()) ||
-      transaction.type.toLowerCase().includes(value.toLowerCase()) ||
-      transaction.date.toLowerCase().includes(value.toLowerCase())
+    const filtered = transactions.filter(
+      (transaction) =>
+        transaction.category.toLowerCase().includes(value.toLowerCase()) ||
+        transaction.type.toLowerCase().includes(value.toLowerCase()) ||
+        transaction.date.toLowerCase().includes(value.toLowerCase())
     );
     setFilteredTransactions(filtered);
   };
 
   const handleViewTransaction = (transaction: Transaction) => {
-    setTransactionDetail(transaction); // Set the selected transaction data
-    setIsTransactionDetailModalVisible(true); // Show the Transaction Detail modal
+    setTransactionDetail(transaction);
+    setIsTransactionDetailModalVisible(true);
   };
 
   const columns = [
@@ -68,89 +85,100 @@ const TransactionsList: React.FC = () => {
       title: "Date",
       dataIndex: "date",
       key: "date",
+      render: (date: string) => {
+        const formattedDate = new Date(date).toLocaleDateString("en-GB");
+        return formattedDate;
+      },
+      responsive: ["xs", "sm", "md", "lg"], 
     },
     {
       title: "Type",
       dataIndex: "type",
       key: "type",
+      responsive: ["sm", "md", "lg"], 
     },
     {
       title: "Category",
       dataIndex: "category",
       key: "category",
+      responsive: ["sm", "md", "lg"], 
     },
     {
       title: "Amount",
       dataIndex: "amount",
       key: "amount",
       render: (amount: number) => `₹${amount.toFixed(2)}`,
+      responsive: ["xs", "sm", "md", "lg"], 
     },
     {
       title: "Actions",
       key: "actions",
-      render: (_, record: Transaction) => (
-        <Button
-          icon={<EyeOutlined />}
-          onClick={() => handleViewTransaction(record)} // Open the Transaction Detail modal with transaction details
-        >
+      render: (_: any, record: Transaction) => (
+        <Button icon={<EyeOutlined />} onClick={() => handleViewTransaction(record)}>
           View
         </Button>
       ),
+      responsive: ["xs", "sm", "md", "lg"], 
     },
   ];
+  
+  
 
   return (
-    <Card title="Transaction List" style={{ maxWidth: 1200, margin: "0 auto", padding: 20 }}>
-      {/* Header with search and Add button */}
-      <Row justify="space-between" align="middle">
-        <Col>
+    <Card title="Transaction List" className="TransactionList">
+      <Row justify="space-between" align="middle" gutter={[16, 16]} wrap>
+        <Col xs={24} sm={12}>
           <Input
             placeholder="Search by Category, Type or Date"
             value={searchText}
             onChange={(e) => handleSearch(e.target.value)}
-            style={{ width: 300 }}
+            style={{ width: "100%" }}
           />
         </Col>
-        <Col>
-          <Button
-            type="primary"
-            icon={<PlusOutlined />}
-            onClick={() => setIsAddModalVisible(true)} // Open AddTransaction modal
-          >
+        <Col xs={24} sm={12} style={{ textAlign: "right" }}>
+          <Button type="primary" icon={<PlusOutlined />} onClick={() => setIsAddModalVisible(true)}>
             Add Transaction
           </Button>
         </Col>
       </Row>
 
-      {/* Table for transactions */}
-      <Table
-        columns={columns}
-        dataSource={filteredTransactions}
-        rowKey="_id"
-        pagination={{ pageSize: 5 }} // Pagination added
-        bordered
-        style={{ marginTop: 20 }}
-      />
+      <Spin spinning={loading}>
+        <Table
+          columns={columns}
+          dataSource={filteredTransactions}
+          rowKey="_id"
+          pagination={{ pageSize: 5 }}
+          bordered
+          style={{ marginTop: 20 }}
+          scroll={{ x: "max-content" }}
+        />
+      </Spin>
 
       {/* Add Transaction Modal */}
-      <AddTransaction
-        visible={isAddModalVisible}
-        onClose={() => setIsAddModalVisible(false)} // Close AddTransaction modal
-        onAdd={handleAddTransaction}
-      />
+      <AddTransaction visible={isAddModalVisible} onClose={() => setIsAddModalVisible(false)} onAdd={handleAddTransaction} />
 
       {/* Transaction Detail Modal */}
       <Modal
-        visible={isTransactionDetailModalVisible && transactionDetail !== null}
-        onCancel={() => setIsTransactionDetailModalVisible(false)} // Close Transaction Detail modal
+        open={isTransactionDetailModalVisible && transactionDetail !== null}
+        onCancel={() => setIsTransactionDetailModalVisible(false)}
         footer={null}
+        width="90%"
+        style={{ maxWidth: 400, margin: "0 auto" }}
       >
         {transactionDetail && (
           <div>
-            <p><strong>Date:</strong> {transactionDetail.date}</p>
-            <p><strong>Type:</strong> {transactionDetail.type}</p>
-            <p><strong>Category:</strong> {transactionDetail.category}</p>
-            <p><strong>Amount:</strong> ₹{transactionDetail.amount.toFixed(2)}</p>
+            <p>
+              <strong>Date:</strong> {transactionDetail.date}
+            </p>
+            <p>
+              <strong>Type:</strong> {transactionDetail.type}
+            </p>
+            <p>
+              <strong>Category:</strong> {transactionDetail.category}
+            </p>
+            <p>
+              <strong>Amount:</strong> ₹{transactionDetail.amount.toFixed(2)}
+            </p>
           </div>
         )}
       </Modal>

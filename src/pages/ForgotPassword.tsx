@@ -1,24 +1,22 @@
-import { useNavigate } from 'react-router-dom'; // For redirection
+import { useNavigate } from 'react-router-dom';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { Button, Typography, Input, message } from 'antd';
-import { sendPasswordResetLink } from '../services/authService';
-import '../styles/Auth.css'; // Import CSS file
+import '../styles/Auth.css'; 
 
 const { Title } = Typography;
 
 const ForgotPassword = () => {
-  const navigate = useNavigate(); // Initialize useNavigate for redirect
+  const navigate = useNavigate(); 
 
   const validationSchema = Yup.object().shape({
     email: Yup.string().email('Invalid email format').required('Email is required'),
   });
 
-  const handleSubmit = async (values: { email: string }) => {
+  const handleSubmit = async () => {
     try {
-      await sendPasswordResetLink(values); // Send password reset link request to backend
+      // await sendPasswordResetLink(values); 
       message.success('Password reset link sent to your email!');
-      // Redirect to the login page after sending the reset link
       navigate('/login');
     } catch (error) {
       message.error('Failed to send reset link. Please try again.');

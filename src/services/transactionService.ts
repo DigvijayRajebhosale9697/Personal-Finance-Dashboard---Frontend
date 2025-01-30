@@ -2,10 +2,10 @@
 
 import api from "./api"; // Import your Axios instance
 
-interface Transaction {
+export default interface Transaction {
   _id?: string;
   date: string;
-  type: "income" | "expense"; // Use lowercase
+  type: "income" | "expense"; 
   category: string;
   amount: number;
 }
